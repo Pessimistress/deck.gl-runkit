@@ -101,7 +101,16 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var CDN_URL = 'https://cdn.rawgit.com/Pessimistress/deck.gl-runkit/master/dist/';
+var defaultProps = {
+  longitude: -122.45,
+  latitude: 37.8,
+  zoom: 12,
+  bearing: 0,
+  pitch: 0,
+  layers: [],
+  style: { height: '400px' },
+  map: true
+};
 
 function inject(key, target, string) {
   var startPattern = '/** START-' + key + ' **/';
@@ -119,12 +128,13 @@ function inject(key, target, string) {
 }
 
 function getHTMLFromDeckGLProps(props) {
+  props = Object.assign({}, defaultProps, props);
 
   var globalVars = {
     MapboxAccessToken: process.env.MapboxAccessToken
   };
 
-  var result = _template2.default.replace(/..\/dist\//g, CDN_URL);
+  var result = _template2.default;
 
   result = inject('GLOBAL-VARS', result, Object.keys(globalVars).map(function (key) {
     return 'const ' + key + ' = ' + JSON.stringify(globalVars[key]) + ';';
@@ -152,24 +162,44 @@ function render(props) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.getHTMLFromDeckGLProps = exports.render = exports.GeoJsonLayer = exports.PolygonLayer = exports.PathLayer = exports.HexagonCellLayer = exports.HexagonLayer = exports.GridCellLayer = exports.GridLayer = exports.ScreenGridLayer = exports.ScatterplotLayer = exports.PointCloudLayer = exports.LineLayer = exports.IconLayer = exports.ArcLayer = exports.DeckGL = undefined;
 
 var _deckglViewer = __webpack_require__(0);
 
-Object.keys(_deckglViewer).forEach(function (key) {
-  if (key === "default" || key === "__esModule") return;
-  Object.defineProperty(exports, key, {
-    enumerable: true,
-    get: function get() {
-      return _deckglViewer[key];
-    }
-  });
-});
-Object.defineProperty(exports, 'default', {
-  enumerable: true,
-  get: function get() {
-    return _deckglViewer.render;
-  }
-});
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function createDummyLayer(layerName) {
+  var DummyLayer = function DummyLayer() {
+    var props = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
+    _classCallCheck(this, DummyLayer);
+
+    this.props = props;
+  };
+
+  DummyLayer.layerName = layerName;
+
+  return DummyLayer;
+}
+
+var DeckGL = exports.DeckGL = _deckglViewer.render;
+
+var ArcLayer = exports.ArcLayer = createDummyLayer('ArcLayer');
+var IconLayer = exports.IconLayer = createDummyLayer('IconLayer');
+var LineLayer = exports.LineLayer = createDummyLayer('LineLayer');
+var PointCloudLayer = exports.PointCloudLayer = createDummyLayer('PointCloudLayer');
+var ScatterplotLayer = exports.ScatterplotLayer = createDummyLayer('ScatterplotLayer');
+var ScreenGridLayer = exports.ScreenGridLayer = createDummyLayer('ScreenGridLayer');
+var GridLayer = exports.GridLayer = createDummyLayer('GridLayer');
+var GridCellLayer = exports.GridCellLayer = createDummyLayer('GridCellLayer');
+var HexagonLayer = exports.HexagonLayer = createDummyLayer('HexagonLayer');
+var HexagonCellLayer = exports.HexagonCellLayer = createDummyLayer('HexagonCellLayer');
+var PathLayer = exports.PathLayer = createDummyLayer('PathLayer');
+var PolygonLayer = exports.PolygonLayer = createDummyLayer('PolygonLayer');
+var GeoJsonLayer = exports.GeoJsonLayer = createDummyLayer('GeoJsonLayer');
+
+exports.render = _deckglViewer.render;
+exports.getHTMLFromDeckGLProps = _deckglViewer.getHTMLFromDeckGLProps;
 
 /***/ }),
 /* 2 */
@@ -228,7 +258,7 @@ function propsToCode(props) {
 /* 3 */
 /***/ (function(module, exports) {
 
-module.exports = "<html>\n<head>\n<script src='../dist/deckgl.min.js'></script>\n<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.js'></script>\n<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.css' rel='stylesheet' />\n<style>\n  body { margin:0; padding:0; }\n  #map, #deckgl { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }\n</style>\n</head>\n<body>\n  <div style=\"position: relative; width: 100%; height: 400px\">\n    <div id='map'></div>\n    <canvas id=\"deckgl\">\n  </div>\n</body>\n<script>\n  /** START-GLOBAL-VARS **/\n  const MapboxAccessToken = 'pk.eyJ1IjoidWJlcmRhdGEiLCJhIjoidGllX1gxUSJ9.gElUooDF7u51guCQREmAhg';\n  /** END-GLOBAL-VARS **/\n\n  const defaultOpts = {\n    longitude: -122.45,\n    latitude: 37.8,\n    zoom: 12,\n    bearing: 0,\n    pitch: 0,\n    layers: [],\n    map: true\n  };\n\n  function onLoad(opts) {\n\n    opts = Object.assign({}, defaultOpts, opts);\n\n    const canvas = document.getElementById('deckgl');\n    const width = canvas.clientWidth;\n    const height = canvas.clientHeight;\n\n    mapboxgl.accessToken = MapboxAccessToken;\n\n    const onViewportChange = function(viewport) {\n      deckgl.setProps(Object.assign({}, viewport, {\n        // Hack: deckgl does not update without changing `layers` array\n        layers: deckgl.props.layers.slice(0)          \n      }));\n      controller.setProps(viewport);\n\n      if (map && Number.isFinite(viewport.longitude)) {\n        map.jumpTo({\n          center: [viewport.longitude, viewport.latitude],\n          zoom: viewport.zoom,\n          bearing: viewport.bearing,\n          pitch: viewport.pitch\n        });\n      }\n    }\n\n    const map = opts.map && new mapboxgl.Map({\n      container: 'map',\n      style: 'mapbox://styles/mapbox/dark-v9',\n      center: [opts.longitude, opts.latitude],\n      zoom: opts.zoom,\n      pitch: opts.pitch,\n      bearing: opts.bearing,\n      interactive: false\n    });\n\n    const deckgl = new DeckGL.experimental.DeckGLJS(Object.assign({}, opts, {\n      canvas,\n      width,\n      height\n    }));\n\n    const controller = new DeckGL.experimental.MapControllerJS(Object.assign({}, opts, {\n      canvas,\n      width,\n      height,\n      onViewportChange\n    }));\n\n    window.addEventListener('resize', function() {\n      onViewportChange({\n        width: canvas.clientWidth,\n        height: canvas.clientHeight\n      });\n    });\n  };\n\n  onLoad(\n  /** START-USER-DATA **/\n    {\n      longitude: -122.45,\n      latitude: 37.8,\n      zoom: 12,\n      pitch: 30,\n      layers: [\n        new DeckGL.ScatterplotLayer({\n          data: [\n            {position: [-122.45, 37.8], color: [255, 0, 0], radius: 100}\n          ]\n        })\n      ]\n    }\n  /** END-USER-DATA **/\n  );\n</script>\n</html>\n";
+module.exports = "<html>\n<head>\n<script src='https://cdn.rawgit.com/Pessimistress/deck.gl-runkit/master/dist/deckgl.min.js'></script>\n<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.js'></script>\n<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.css' rel='stylesheet' />\n<style>\n  body { margin:0; padding:0; }\n  #container { position: relative; width: 100%; height: 100vh; }\n  #map, #deckgl { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }\n</style>\n</head>\n<body>\n  <div id=\"container\">\n    <div id='map'></div>\n    <canvas id=\"deckgl\"></canvas>\n  </div>\n</body>\n<script>\n  /** START-GLOBAL-VARS **/\n  const MapboxAccessToken = 'pk.eyJ1IjoidWJlcmRhdGEiLCJhIjoidGllX1gxUSJ9.gElUooDF7u51guCQREmAhg';\n  /** END-GLOBAL-VARS **/\n\n  function onLoad(opts) {\n    const container = document.getElementById('container');\n    for (const key in opts.style) {\n      container.style[key] = opts.style[key];\n    }\n\n    const canvas = document.getElementById('deckgl');\n    const width = canvas.clientWidth;\n    const height = canvas.clientHeight;\n\n    mapboxgl.accessToken = MapboxAccessToken;\n\n    const onViewportChange = function(viewport) {\n      deckgl.setProps(Object.assign({}, viewport, {\n        // Hack: deckgl does not update without changing `layers` array\n        layers: deckgl.props.layers.slice(0)          \n      }));\n      controller.setProps(viewport);\n\n      if (map && Number.isFinite(viewport.longitude)) {\n        map.jumpTo({\n          center: [viewport.longitude, viewport.latitude],\n          zoom: viewport.zoom,\n          bearing: viewport.bearing,\n          pitch: viewport.pitch\n        });\n      }\n    }\n\n    const map = opts.map && new mapboxgl.Map({\n      container: 'map',\n      style: 'mapbox://styles/mapbox/dark-v9',\n      center: [opts.longitude, opts.latitude],\n      zoom: opts.zoom,\n      pitch: opts.pitch || 0,\n      bearing: opts.bearing || 0,\n      interactive: false\n    });\n\n    const deckgl = new DeckGL.experimental.DeckGLJS(Object.assign({}, opts, {\n      canvas,\n      width,\n      height\n    }));\n\n    const controller = new DeckGL.experimental.MapControllerJS(Object.assign({}, opts, {\n      canvas,\n      width,\n      height,\n      onViewportChange\n    }));\n\n    window.addEventListener('resize', function() {\n      onViewportChange({\n        width: canvas.clientWidth,\n        height: canvas.clientHeight\n      });\n    });\n  };\n\n  onLoad(\n  /** START-USER-DATA **/\n    {\n      longitude: -122.45,\n      latitude: 37.8,\n      zoom: 12,\n      map: true,\n      layers: [\n        new DeckGL.ScatterplotLayer({\n          data: [\n            {position: [-122.45, 37.8], color: [255, 0, 0], radius: 100}\n          ]\n        })\n      ]\n    }\n  /** END-USER-DATA **/\n  );\n</script>\n</html>\n";
 
 /***/ }),
 /* 4 */

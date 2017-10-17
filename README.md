@@ -3,11 +3,9 @@ Runkit value viewer using deck.gl
 
 ## Usage
 ```js
-require('luma.gl');
-require('react');
-const {ScatterplotLayer} = require('deck.gl');
+const {DeckGL, ScatterplotLayer} = require('deck.gl-runkit');
 
-require("deck.gl-runkit").render({
+DeckGL({
   longitude: -122.45,
   latitude: 37.8,
   zoom: 12,
