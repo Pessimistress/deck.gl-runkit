@@ -1,13 +1,8 @@
 import {ValueViewerSymbol} from '@runkit/value-viewer';
-import lave from 'lave';
-import {generate} from 'escodegen';
 import template from 'html-loader!./template.html';
+import {propsToCode} from './utils';
 
 const CDN_URL = 'http://cdn.rawgit.com/Pessimistress/deck.gl-runkit/master/dist/';
-
-function toCode(object) {
-  return lave(object, {generate, format: 'expression'});
-}
 
 function inject(key, target, string) {
   const startPattern = `/** START-${key} **/`;
@@ -36,7 +31,7 @@ export function getHTMLFromDeckGLProps(props) {
     return `const ${key} = ${globalVars[key]};`
   }).join('\n'));
 
-  result = inject('USER-DATA', result, toCode(props));
+  result = inject('USER-DATA', result, propsToCode(props));
 
   return result;
 }

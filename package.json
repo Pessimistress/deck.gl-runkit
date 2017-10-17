@@ -2,7 +2,7 @@
   "name": "deck.gl-runkit",
   "description": "RunKit value viewer with deck.gl",
   "license": "MIT",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "keywords": [
     "webgl",
     "visualization",

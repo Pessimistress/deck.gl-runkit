@@ -19,10 +19,6 @@
   const MapboxAccessToken = 'pk.eyJ1IjoidWJlcmRhdGEiLCJhIjoidGllX1gxUSJ9.gElUooDF7u51guCQREmAhg';
   /** END-GLOBAL-VARS **/
 
-  for (const key in DeckGL) {
-    window[key] = DeckGL[key];
-  }
-
   const defaultOpts = {
     longitude: -122.45,
     latitude: 37.8,
@@ -70,13 +66,13 @@
       interactive: false
     });
 
-    const deckgl = new experimental.DeckGLJS(Object.assign({}, opts, {
+    const deckgl = new DeckGL.experimental.DeckGLJS(Object.assign({}, opts, {
       canvas,
       width,
       height
     }));
 
-    const controller = new experimental.MapControllerJS(Object.assign({}, opts, {
+    const controller = new DeckGL.experimental.MapControllerJS(Object.assign({}, opts, {
       canvas,
       width,
       height,
@@ -99,7 +95,7 @@
       zoom: 12,
       pitch: 30,
       layers: [
-        new ScatterplotLayer({
+        new DeckGL.ScatterplotLayer({
           data: [
             {position: [-122.45, 37.8], color: [255, 0, 0], radius: 100}
           ]
