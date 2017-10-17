@@ -2,6 +2,10 @@ import {render, getHTMLFromDeckGLProps} from './deckgl-viewer';
 
 function createDummyLayer(layerName) {
   class DummyLayer {
+    static get name() {
+      return layerName;
+    }
+
     constructor(props = {}) {
       this.props = props;
     }
@@ -11,8 +15,7 @@ function createDummyLayer(layerName) {
   return DummyLayer;
 }
 
-export const DeckGL = render;
-
+/* Layers */
 export const ArcLayer = createDummyLayer('ArcLayer');
 export const IconLayer = createDummyLayer('IconLayer');
 export const LineLayer = createDummyLayer('LineLayer');
@@ -27,7 +30,12 @@ export const PathLayer = createDummyLayer('PathLayer');
 export const PolygonLayer = createDummyLayer('PolygonLayer');
 export const GeoJsonLayer = createDummyLayer('GeoJsonLayer');
 
+/* Render functions */
 export {
   render,
   getHTMLFromDeckGLProps
 };
+export const DeckGL = render;
+
+/* Constants */
+export {COORDINATE_SYSTEM} from 'deck.gl/dist/core/lib/constants';
