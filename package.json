@@ -1,0 +1,47 @@
+{
+  "name": "deck.gl-runkit",
+  "description": "RunKit value viewer with deck.gl",
+  "license": "MIT",
+  "version": "0.0.1",
+  "keywords": [
+    "webgl",
+    "visualization",
+    "runkit"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Pessimistress/deck.gl-runkit"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "node test/app.js > dist/app.html && open dist/app.html",
+    "build-clean": "rm -fr dist && mkdir dist",
+    "build-deckgl": "webpack --config webpack/deckgl.config.js",
+    "build-lib": "webpack --config webpack/build.config.js",
+    "build": "npm run build-clean && npm run build-deckgl && npm run build-lib",
+    "publish-prod": "npm run build && npm publish",
+    "publish-beta": "npm run build && npm publish --tag beta"
+  },
+  "dependencies": {
+    "@runkit/value-viewer": "^1.0.0",
+    "deck.gl": "4.2.0-alpha.15",
+    "escodegen": "^1.9.0",
+    "lave": "^1.1.10"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.22.2",
+    "babel-core": "^6.22.1",
+    "babel-loader": "^6.2.10",
+    "babel-polyfill": "^6.20.0",
+    "babel-preset-es2015": "^6.4.3",
+    "babel-preset-stage-0": "^6.24.1",
+    "babel-preset-stage-2": "^6.22.0",
+    "html-loader": "^0.5.1",
+    "uglify-js": "^2.6.1",
+    "webpack": "^2.4.0",
+    "webpack-dev-server": "^2.4.0"
+  }
+}

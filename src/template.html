@@ -1,0 +1,112 @@
+<html>
+<head>
+<script src='../dist/deckgl.min.js'></script>
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.js'></script>
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.41.0/mapbox-gl.css' rel='stylesheet' />
+<style>
+  body { margin:0; padding:0; }
+  #map, #deckgl { position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+  <div style="position: relative; width: 100%; height: 400px">
+    <div id='map'></div>
+    <canvas id="deckgl">
+  </div>
+</body>
+<script>
+  /** START-GLOBAL-VARS **/
+  const MapboxAccessToken = 'pk.eyJ1IjoidWJlcmRhdGEiLCJhIjoidGllX1gxUSJ9.gElUooDF7u51guCQREmAhg';
+  /** END-GLOBAL-VARS **/
+
+  for (const key in DeckGL) {
+    window[key] = DeckGL[key];
+  }
+
+  const defaultOpts = {
+    longitude: -122.45,
+    latitude: 37.8,
+    zoom: 12,
+    bearing: 0,
+    pitch: 0,
+    layers: [],
+    map: true
+  };
+
+  function onLoad(opts) {
+
+    opts = Object.assign({}, defaultOpts, opts);
+
+    const canvas = document.getElementById('deckgl');
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+
+    mapboxgl.accessToken = MapboxAccessToken;
+
+    const onViewportChange = function(viewport) {
+      deckgl.setProps(Object.assign({}, viewport, {
+        // Hack: deckgl does not update without changing `layers` array
+        layers: deckgl.props.layers.slice(0)          
+      }));
+      controller.setProps(viewport);
+
+      if (map && Number.isFinite(viewport.longitude)) {
+        map.jumpTo({
+          center: [viewport.longitude, viewport.latitude],
+          zoom: viewport.zoom,
+          bearing: viewport.bearing,
+          pitch: viewport.pitch
+        });
+      }
+    }
+
+    const map = opts.map && new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/dark-v9',
+      center: [opts.longitude, opts.latitude],
+      zoom: opts.zoom,
+      pitch: opts.pitch,
+      bearing: opts.bearing,
+      interactive: false
+    });
+
+    const deckgl = new experimental.DeckGLJS(Object.assign({}, opts, {
+      canvas,
+      width,
+      height
+    }));
+
+    const controller = new experimental.MapControllerJS(Object.assign({}, opts, {
+      canvas,
+      width,
+      height,
+      onViewportChange
+    }));
+
+    window.addEventListener('resize', function() {
+      onViewportChange({
+        width: canvas.clientWidth,
+        height: canvas.clientHeight
+      });
+    });
+  };
+
+  onLoad(
+  /** START-USER-DATA **/
+    {
+      longitude: -122.45,
+      latitude: 37.8,
+      zoom: 12,
+      pitch: 30,
+      layers: [
+        new ScatterplotLayer({
+          data: [
+            {position: [-122.45, 37.8], color: [255, 0, 0], radius: 100}
+          ]
+        })
+      ]
+    }
+  /** END-USER-DATA **/
+  );
+</script>
+</html>
