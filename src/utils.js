@@ -13,7 +13,20 @@ export function propsToCode(props) {
   const otherProps = Object.assign({}, props, {layers: undefined});
 
   const layerProps = layers.filter(Boolean).map(layer => {
-    return Object.assign({}, layer.props, {layerName: layer.constructor.layerName});
+    const Layer = layer.constructor;
+    const defaultProps = new Layer({}).props;
+    const props = {};
+
+    for (const key in layer.props) {
+      if (layer.props[key] !== defaultProps[key]) {
+        props[key] = layer.props[key];
+      }
+    }
+
+    return {
+      props,
+      layerName: Layer.layerName
+    };
   });
 
   return `(function() {
@@ -22,7 +35,7 @@ var layerProps = ${objectToCode(layerProps)};
 
 props.layers = layerProps.map(function(layer) {
   var constructor = eval('DeckGL.' + layer.layerName);
-  return new constructor(layer);
+  return new constructor(layer.props);
 });
 
 return props;

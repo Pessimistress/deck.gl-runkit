@@ -2,7 +2,16 @@ import {ValueViewerSymbol} from '@runkit/value-viewer';
 import template from 'html-loader!./template.html';
 import {propsToCode} from './utils';
 
-const CDN_URL = 'https://cdn.rawgit.com/Pessimistress/deck.gl-runkit/master/dist/';
+const defaultProps = {
+  longitude: -122.45,
+  latitude: 37.8,
+  zoom: 12,
+  bearing: 0,
+  pitch: 0,
+  layers: [],
+  style: {height: '400px'},
+  map: true
+};
 
 function inject(key, target, string) {
   const startPattern = `/** START-${key} **/`;
@@ -20,12 +29,13 @@ function inject(key, target, string) {
 }
 
 export function getHTMLFromDeckGLProps(props) {
+  props = Object.assign({}, defaultProps, props);
 
   const globalVars = {
     MapboxAccessToken: process.env.MapboxAccessToken
   };
 
-  let result = template.replace(/..\/dist\//g, CDN_URL);
+  let result = template;
 
   result = inject('GLOBAL-VARS', result, Object.keys(globalVars).map(key => {
     return `const ${key} = ${JSON.stringify(globalVars[key])};`

@@ -101,7 +101,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var CDN_URL = 'http://cdn.rawgit.com/Pessimistress/deck.gl-runkit/master/dist/';
+var CDN_URL = 'https://cdn.rawgit.com/Pessimistress/deck.gl-runkit/master/dist/';
 
 function inject(key, target, string) {
   var startPattern = '/** START-' + key + ' **/';
@@ -127,7 +127,7 @@ function getHTMLFromDeckGLProps(props) {
   var result = _template2.default.replace(/..\/dist\//g, CDN_URL);
 
   result = inject('GLOBAL-VARS', result, Object.keys(globalVars).map(function (key) {
-    return 'const ' + key + ' = ' + globalVars[key] + ';';
+    return 'const ' + key + ' = ' + JSON.stringify(globalVars[key]) + ';';
   }).join('\n'));
 
   result = inject('USER-DATA', result, (0, _utils.propsToCode)(props));
@@ -205,10 +205,23 @@ function propsToCode(props) {
   var otherProps = Object.assign({}, props, { layers: undefined });
 
   var layerProps = layers.filter(Boolean).map(function (layer) {
-    return Object.assign({}, layer.props, { layerName: layer.constructor.layerName });
+    var Layer = layer.constructor;
+    var defaultProps = new Layer({}).props;
+    var props = {};
+
+    for (var key in layer.props) {
+      if (layer.props[key] !== defaultProps[key]) {
+        props[key] = layer.props[key];
+      }
+    }
+
+    return {
+      props: props,
+      layerName: Layer.layerName
+    };
   });
 
-  return '(function() {\nvar props = ' + objectToCode(otherProps) + ';\nvar layerProps = ' + objectToCode(layerProps) + ';\n\nprops.layers = layerProps.map(function(layer) {\n  var constructor = eval(\'DeckGL.\' + layer.layerName);\n  return new constructor(layer);\n});\n\nreturn props;\n})()';
+  return '(function() {\nvar props = ' + objectToCode(otherProps) + ';\nvar layerProps = ' + objectToCode(layerProps) + ';\n\nprops.layers = layerProps.map(function(layer) {\n  var constructor = eval(\'DeckGL.\' + layer.layerName);\n  return new constructor(layer.props);\n});\n\nreturn props;\n})()';
 }
 
 /***/ }),
