@@ -226,7 +226,7 @@ var LIFECYCLE = exports.LIFECYCLE = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.COORDINATE_SYSTEM = exports.getHTMLFromDeckGLProps = exports.render = exports.GeoJsonLayer = exports.PolygonLayer = exports.PathLayer = exports.HexagonCellLayer = exports.HexagonLayer = exports.GridCellLayer = exports.GridLayer = exports.ScreenGridLayer = exports.ScatterplotLayer = exports.PointCloudLayer = exports.LineLayer = exports.IconLayer = exports.ArcLayer = exports.DeckGL = undefined;
+exports.COORDINATE_SYSTEM = exports.DeckGL = exports.getHTMLFromDeckGLProps = exports.render = exports.GeoJsonLayer = exports.PolygonLayer = exports.PathLayer = exports.HexagonCellLayer = exports.HexagonLayer = exports.GridCellLayer = exports.GridLayer = exports.ScreenGridLayer = exports.ScatterplotLayer = exports.PointCloudLayer = exports.LineLayer = exports.IconLayer = exports.ArcLayer = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -268,9 +268,7 @@ function createDummyLayer(layerName) {
   return DummyLayer;
 }
 
-var DeckGL = exports.DeckGL = _deckglViewer.render;
-
-/* layers */
+/* Layers */
 var ArcLayer = exports.ArcLayer = createDummyLayer('ArcLayer');
 var IconLayer = exports.IconLayer = createDummyLayer('IconLayer');
 var LineLayer = exports.LineLayer = createDummyLayer('LineLayer');
@@ -285,10 +283,12 @@ var PathLayer = exports.PathLayer = createDummyLayer('PathLayer');
 var PolygonLayer = exports.PolygonLayer = createDummyLayer('PolygonLayer');
 var GeoJsonLayer = exports.GeoJsonLayer = createDummyLayer('GeoJsonLayer');
 
+/* Render functions */
 exports.render = _deckglViewer.render;
 exports.getHTMLFromDeckGLProps = _deckglViewer.getHTMLFromDeckGLProps;
+var DeckGL = exports.DeckGL = _deckglViewer.render;
 
-/* deck.gl constants */
+/* Constants */
 
 /***/ }),
 /* 3 */
