@@ -2,7 +2,7 @@ import {ValueViewerSymbol} from '@runkit/value-viewer';
 import template from 'html-loader!./template.html';
 import {propsToCode} from './utils';
 
-const CDN_URL = 'http://cdn.rawgit.com/Pessimistress/deck.gl-runkit/master/dist/';
+const CDN_URL = 'https://cdn.rawgit.com/Pessimistress/deck.gl-runkit/master/dist/';
 
 function inject(key, target, string) {
   const startPattern = `/** START-${key} **/`;
@@ -28,7 +28,7 @@ export function getHTMLFromDeckGLProps(props) {
   let result = template.replace(/..\/dist\//g, CDN_URL);
 
   result = inject('GLOBAL-VARS', result, Object.keys(globalVars).map(key => {
-    return `const ${key} = ${globalVars[key]};`
+    return `const ${key} = ${JSON.stringify(globalVars[key])};`
   }).join('\n'));
 
   result = inject('USER-DATA', result, propsToCode(props));
