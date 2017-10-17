@@ -1,9 +1,20 @@
 import lave from 'lave';
 import {generate} from 'escodegen';
 
+const BAD_ARROW_FUNC = /function([^=>\.\{\}]*)=>/;
+
 function objectToCode(object) {
-  const func = lave(object, {generate, format: 'function'});
-  return `(${func.replace(/;$/, '')})()`;
+  let func = lave(object, {generate, format: 'function'});
+
+  // Fix arrow function syntax
+  while (BAD_ARROW_FUNC.test(func)) {
+    func = func.replace(BAD_ARROW_FUNC, '$1=>');
+  }
+
+  // Remove trailing semicolon
+  func = func.replace(/;$/, '');
+
+  return `(${func})()`;
 }
 
 export function propsToCode(props) {
