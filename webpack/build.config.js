@@ -14,6 +14,7 @@ module.exports = {
   },
 
   externals: [
+    '@runkit/value-viewer',
     'escodegen',
     'lave'
   ],

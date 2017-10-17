@@ -1,2 +1,2 @@
-export {getHTMLFromDeckGLProps} from './deckgl-viewer';
-export {getRunkitViewer as default} from './deckgl-viewer';
+export * from './deckgl-viewer';
+export {render as default} from './deckgl-viewer';

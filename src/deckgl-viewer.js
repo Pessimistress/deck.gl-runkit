@@ -3,7 +3,7 @@ import lave from 'lave';
 import {generate} from 'escodegen';
 import template from 'html-loader!./template.html';
 
-const CDN_URL = 'https://raw.githubusercontent.com/Pessimistress/deck.gl-runkit/master/dist/';
+const CDN_URL = 'http://cdn.rawgit.com/Pessimistress/deck.gl-runkit/master/dist/';
 
 function toCode(object) {
   return lave(object, {generate, format: 'expression'});
@@ -41,7 +41,7 @@ export function getHTMLFromDeckGLProps(props) {
   return result;
 }
 
-export function getRunkitViewer(props) {
+export function render(props) {
   return Object.assign(props, {
     [ValueViewerSymbol]: {
       title: 'deck.gl',
