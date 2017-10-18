@@ -12,18 +12,22 @@ const CANVAS_STYLE = {
   height: '100%'
 };
 
-const DEFAULT_OPTIONS = {
-  mapbox: win.mapboxgl
-};
-
 class DeckGL {
 
-  constructor(container, props, opts = DEFAULT_OPTIONS) {
+  constructor(props = {}) {
     if (!doc) {
       // Not browser
       return;
     }
 
+    // Default options
+    props = Object.assign({
+      container: doc.body,
+      mapbox: win.mapboxgl,
+      mapStyle: 'mapbox://styles/mapbox/dark-v9'
+    }, props);
+
+    const container = props.container;
     const width = container.clientWidth;
     const height = container.clientHeight;
 
@@ -40,9 +44,9 @@ class DeckGL {
     container.appendChild(deckCanvas);
     Object.assign(deckCanvas.style, CANVAS_STYLE);
 
-    this._map = opts.mapbox && new opts.mapbox.Map({
+    this._map = props.mapbox && new props.mapbox.Map({
       container: mapCanvas,
-      style: 'mapbox://styles/mapbox/dark-v9',
+      style: props.mapStyle,
       center: [props.longitude, props.latitude],
       zoom: props.zoom,
       pitch: props.pitch || 0,
@@ -69,11 +73,13 @@ class DeckGL {
     this._container = container;
   }
 
-  destroy() {
+  finalize() {
+    window.removeEventListener('resize', this._resize);
+    this._controller.finalize();
+    this._deck.finalize();
     if (this._map) {
       this._map.remove();
     }
-    window.removeEventListener('resize', this._resize);
   }
 
   setProps(props) {
