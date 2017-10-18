@@ -26,59 +26,12 @@
       container.style[key] = opts.style[key];
     }
 
-    const canvas = document.getElementById('deckgl');
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-
     mapboxgl.accessToken = MapboxAccessToken;
 
-    const onViewportChange = function(viewport) {
-      deckgl.setProps(Object.assign({}, viewport, {
-        // Hack: deckgl does not update without changing `layers` array
-        layers: deckgl.props.layers.slice(0)          
-      }));
-      controller.setProps(viewport);
-
-      if (map && Number.isFinite(viewport.longitude)) {
-        map.jumpTo({
-          center: [viewport.longitude, viewport.latitude],
-          zoom: viewport.zoom,
-          bearing: viewport.bearing,
-          pitch: viewport.pitch
-        });
-      }
-    }
-
-    const map = opts.map && new mapboxgl.Map({
-      container: 'map',
-      style: 'mapbox://styles/mapbox/dark-v9',
-      center: [opts.longitude, opts.latitude],
-      zoom: opts.zoom,
-      pitch: opts.pitch || 0,
-      bearing: opts.bearing || 0,
-      interactive: false
+    new DeckGL(container, opts, {
+      mapbox: opts.map && mapboxgl
     });
-
-    const deckgl = new DeckGL.experimental.DeckGLJS(Object.assign({}, opts, {
-      canvas,
-      width,
-      height
-    }));
-
-    const controller = new DeckGL.experimental.MapControllerJS(Object.assign({}, opts, {
-      canvas,
-      width,
-      height,
-      onViewportChange
-    }));
-
-    window.addEventListener('resize', function() {
-      onViewportChange({
-        width: canvas.clientWidth,
-        height: canvas.clientHeight
-      });
-    });
-  };
+  }
 
   onLoad(
   /** START-USER-DATA **/
