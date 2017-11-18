@@ -24,7 +24,9 @@ class DeckGL {
     props = Object.assign({
       container: doc.body,
       mapbox: win.mapboxgl,
-      mapStyle: 'mapbox://styles/mapbox/dark-v9'
+      mapStyle: 'mapbox://styles/mapbox/dark-v9',
+      pitch: 0,
+      bearing: 0
     }, props);
 
     const container = props.container;
@@ -49,8 +51,8 @@ class DeckGL {
       style: props.mapStyle,
       center: [props.longitude, props.latitude],
       zoom: props.zoom,
-      pitch: props.pitch || 0,
-      bearing: props.bearing || 0,
+      pitch: props.pitch,
+      bearing: props.bearing,
       interactive: false
     });
 
@@ -83,10 +85,7 @@ class DeckGL {
   }
 
   setProps(props) {
-    this._deck.setProps(Object.assign({
-      // Hack: deckgl does not update without changing `layers` array
-      layers: this._deck.props.layers.slice(0)          
-    }, props));
+    this._deck.setProps(props);
 
     this._controller.setProps(props);
 
