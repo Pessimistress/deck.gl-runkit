@@ -2,7 +2,7 @@
   "name": "deck.gl-runkit",
   "description": "RunKit value viewer with deck.gl",
   "license": "MIT",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "keywords": [
     "webgl",
     "visualization",
@@ -20,13 +20,14 @@
     "test": "node test/app.js > dist/app.html && open dist/app.html",
     "build-deckgl": "webpack --config webpack/deckgl.config.js",
     "build-lib": "webpack --config webpack/build.config.js",
-    "build": "npm run build-deckgl && npm run build-lib",
+    "build": "rm -rf dist && mkdir dist && npm run build-deckgl && npm run build-lib",
     "publish-prod": "npm run build && npm publish",
     "publish-beta": "npm run build && npm publish --tag beta"
   },
   "dependencies": {
     "@runkit/value-viewer": "^1.0.0",
-    "deck.gl": "4.2.0-alpha.22",
+    "deck.gl": "4.2.0-alpha.26",
+    "luma.gl": "4.1.0-alpha.9",
     "escodegen": "^1.9.0",
     "lave": "^1.1.10"
   },

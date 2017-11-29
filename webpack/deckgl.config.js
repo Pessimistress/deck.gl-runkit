@@ -1,6 +1,8 @@
 const {resolve} = require('path');
 const webpack = require('webpack');
 
+var version = process.env.npm_package_version;
+
 module.exports = {
 
   entry: resolve('./src/deckgl.js'),
@@ -8,16 +10,14 @@ module.exports = {
   // Generate a bundle in dist folder
   output: {
     path: resolve('./dist'),
-    filename: 'deckgl.min.js',
+    filename: `deckgl-${version}.min.js`,
   },
 
   devtool: '',
 
   resolve: {
     alias: {
-      'deck.gl': resolve('./node_modules/deck.gl/dist/core'),
-      'deck.gl-core': resolve('./node_modules/deck.gl/dist/core'),
-      'deck.gl-layers': resolve('./node_modules/deck.gl/dist/core-layers')
+      // 'deck.gl': resolve('./node_modules/deck.gl/dist/core')
     }
   },
 

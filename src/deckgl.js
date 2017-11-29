@@ -1,5 +1,6 @@
-import * as deckglCore from 'deck.gl-core';
-import * as deckglLayers from 'deck.gl-layers';
+import * as deckglCore from 'deck.gl/dist/core';
+import * as deckglLayers from 'deck.gl/dist/core-layers';
+import * as LumaGL from 'luma.gl';
 
 const win = typeof window === undefined ? global : window;
 const doc = win.document;
@@ -66,7 +67,10 @@ class DeckGL {
       canvas: deckCanvas,
       width,
       height,
-      onViewportChange: viewport => this.setProps(viewport)
+      onViewportChange: viewport => {
+        this.setProps(viewport);
+        props.onViewportChange(viewport);
+      }
     }));
 
     this._resize = this._resize.bind(this);
@@ -109,3 +113,4 @@ class DeckGL {
 }
 
 win.DeckGL = Object.assign(DeckGL, deckglCore, deckglLayers);
+win.LumaGL = LumaGL;
