@@ -13,6 +13,27 @@ const CANVAS_STYLE = {
   height: '100%'
 };
 
+const VIEWPORT_PROPS = ['longitude', 'latitude', 'zoom', 'bearing', 'pitch'];
+function extractMapboxViewport(props) {
+  if (VIEWPORT_PROPS.every(name => !isFinite(props[name]))) {
+    return null;
+  }
+  const viewport = {};
+  if (isFinite(props.longitude) && isFinite(props.latitude)) {
+    viewport.center = [props.longitude, props.latitude];
+  }
+  if (isFinite(props.zoom)) {
+    viewport.zoom = props.zoom;
+  }
+  if (isFinite(props.bearing)) {
+    viewport.bearing = props.bearing;
+  }
+  if (isFinite(props.pitch)) {
+    viewport.pitch = props.pitch;
+  }
+  return viewport;
+}
+
 class DeckGL {
 
   constructor(props = {}) {
@@ -27,7 +48,8 @@ class DeckGL {
       mapbox: win.mapboxgl,
       mapStyle: 'mapbox://styles/mapbox/dark-v9',
       pitch: 0,
-      bearing: 0
+      bearing: 0,
+      onViewportChange: () => {}
     }, props);
 
     const container = props.container;
@@ -47,15 +69,11 @@ class DeckGL {
     container.appendChild(deckCanvas);
     Object.assign(deckCanvas.style, CANVAS_STYLE);
 
-    this._map = props.mapbox && new props.mapbox.Map({
+    this._map = props.mapbox && new props.mapbox.Map(Object.assign({
       container: mapCanvas,
       style: props.mapStyle,
-      center: [props.longitude, props.latitude],
-      zoom: props.zoom,
-      pitch: props.pitch,
-      bearing: props.bearing,
       interactive: false
-    });
+    }, extractMapboxViewport(props)));
 
     this._deck = new DeckGL.experimental.DeckGLJS(Object.assign({}, props, {
       canvas: deckCanvas,
@@ -63,7 +81,9 @@ class DeckGL {
       height
     }));
 
-    this._controller = new DeckGL.experimental.MapControllerJS(Object.assign({}, props, {
+    const isMap = !props.viewport || (props.viewport instanceof DeckGL.WebMercatorViewport);
+
+    this._controller = isMap && new DeckGL.experimental.MapControllerJS(Object.assign({}, props, {
       canvas: deckCanvas,
       width,
       height,
@@ -81,8 +101,10 @@ class DeckGL {
 
   finalize() {
     window.removeEventListener('resize', this._resize);
-    this._controller.finalize();
     this._deck.finalize();
+    if (this._controller) {
+      this._controller.finalize();
+    }
     if (this._map) {
       this._map.remove();
     }
@@ -91,15 +113,18 @@ class DeckGL {
   setProps(props) {
     this._deck.setProps(props);
 
-    this._controller.setProps(props);
+    if (this._controller) {
+      this._controller.setProps(props);
+    }
 
-    if (this._map && Number.isFinite(props.longitude)) {
-      this._map.jumpTo({
-        center: [props.longitude, props.latitude],
-        zoom: props.zoom,
-        bearing: props.bearing || 0,
-        pitch: props.pitch || 0
-      });
+    if (this._map) {
+      const viewport = extractMapboxViewport(props);
+      if (viewport) {
+        this._map.jumpTo(viewport);
+      }
+      if (props.mapStyle) {
+        this._map.setStyle(props.mapStyle);
+      }
     }
   }
 
